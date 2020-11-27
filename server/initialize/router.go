@@ -6,6 +6,7 @@ import (
 	"gin-vue-admin/middleware"
 	"gin-vue-admin/router"
 	"github.com/gin-gonic/gin"
+	t "github.com/goxiaoy/go-saas/gin/middleware"
 	"github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 	"net/http"
@@ -21,6 +22,8 @@ func Routers() *gin.Engine {
 	// 跨域
 	Router.Use(middleware.Cors())
 	global.GVA_LOG.Info("use middleware cors")
+	// multi-tenancy
+	Router.Use(t.MultiTenancy(nil,nil,global.GVA_TENANT_STORE))
 	Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	global.GVA_LOG.Info("register swagger handler")
 	// 方便统一添加路由组前缀 多服务器上线使用
