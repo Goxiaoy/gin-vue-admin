@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"gin-vue-admin/global"
 	"gin-vue-admin/model"
 	"gin-vue-admin/model/request"
@@ -12,8 +13,8 @@ import (
 //@param: sysDictionaryDetail model.SysDictionaryDetail
 //@return: err error
 
-func CreateSysDictionaryDetail(sysDictionaryDetail model.SysDictionaryDetail) (err error) {
-	err = global.GVA_DB.Create(&sysDictionaryDetail).Error
+func CreateSysDictionaryDetail(ctx context.Context,sysDictionaryDetail model.SysDictionaryDetail) (err error) {
+	err = global.GVA_DB(ctx).Create(&sysDictionaryDetail).Error
 	return err
 }
 
@@ -23,8 +24,8 @@ func CreateSysDictionaryDetail(sysDictionaryDetail model.SysDictionaryDetail) (e
 //@param: sysDictionaryDetail model.SysDictionaryDetail
 //@return: err error
 
-func DeleteSysDictionaryDetail(sysDictionaryDetail model.SysDictionaryDetail) (err error) {
-	err = global.GVA_DB.Delete(sysDictionaryDetail).Error
+func DeleteSysDictionaryDetail(ctx context.Context,sysDictionaryDetail model.SysDictionaryDetail) (err error) {
+	err = global.GVA_DB(ctx).Delete(sysDictionaryDetail).Error
 	return err
 }
 
@@ -34,8 +35,8 @@ func DeleteSysDictionaryDetail(sysDictionaryDetail model.SysDictionaryDetail) (e
 //@param: sysDictionaryDetail *model.SysDictionaryDetail
 //@return: err error
 
-func UpdateSysDictionaryDetail(sysDictionaryDetail *model.SysDictionaryDetail) (err error) {
-	err = global.GVA_DB.Save(sysDictionaryDetail).Error
+func UpdateSysDictionaryDetail(ctx context.Context,sysDictionaryDetail *model.SysDictionaryDetail) (err error) {
+	err = global.GVA_DB(ctx).Save(sysDictionaryDetail).Error
 	return err
 }
 
@@ -45,8 +46,8 @@ func UpdateSysDictionaryDetail(sysDictionaryDetail *model.SysDictionaryDetail) (
 //@param: id uint
 //@return: err error, sysDictionaryDetail model.SysDictionaryDetail
 
-func GetSysDictionaryDetail(id uint) (err error, sysDictionaryDetail model.SysDictionaryDetail) {
-	err = global.GVA_DB.Where("id = ?", id).First(&sysDictionaryDetail).Error
+func GetSysDictionaryDetail(ctx context.Context,id uint) (err error, sysDictionaryDetail model.SysDictionaryDetail) {
+	err = global.GVA_DB(ctx).Where("id = ?", id).First(&sysDictionaryDetail).Error
 	return
 }
 
@@ -56,11 +57,11 @@ func GetSysDictionaryDetail(id uint) (err error, sysDictionaryDetail model.SysDi
 //@param: info request.SysDictionaryDetailSearch
 //@return: err error
 
-func GetSysDictionaryDetailInfoList(info request.SysDictionaryDetailSearch) (err error, list interface{}, total int64) {
+func GetSysDictionaryDetailInfoList(ctx context.Context,info request.SysDictionaryDetailSearch) (err error, list interface{}, total int64) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
-	db := global.GVA_DB.Model(&model.SysDictionaryDetail{})
+	db := global.GVA_DB(ctx).Model(&model.SysDictionaryDetail{})
 	var sysDictionaryDetails []model.SysDictionaryDetail
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.Label != "" {

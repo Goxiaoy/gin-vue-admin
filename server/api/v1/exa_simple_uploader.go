@@ -42,7 +42,7 @@ func SimpleUploaderUpload(c *gin.Context) {
 		return
 	}
 	chunk.CurrentChunkPath = chunkPath
-	err = service.SaveChunk(chunk)
+	err = service.SaveChunk(c.Request.Context(),chunk)
 	if err != nil {
 		global.GVA_LOG.Error("切片创建失败!", zap.Any("err", err))
 		response.FailWithMessage("切片创建失败", c)
@@ -61,7 +61,7 @@ func SimpleUploaderUpload(c *gin.Context) {
 // @Router /simpleUploader/checkFileMd5 [get]
 func CheckFileMd5(c *gin.Context) {
 	md5 := c.Query("md5")
-	err, chunks, isDone := service.CheckFileMd5(md5)
+	err, chunks, isDone := service.CheckFileMd5(c.Request.Context(),md5)
 	if err != nil {
 		global.GVA_LOG.Error("md5读取失败!", zap.Any("err", err))
 		response.FailWithMessage("md5读取失败", c)
@@ -83,7 +83,7 @@ func CheckFileMd5(c *gin.Context) {
 func MergeFileMd5(c *gin.Context) {
 	md5 := c.Query("md5")
 	fileName := c.Query("fileName")
-	err := service.MergeFileMd5(md5, fileName)
+	err := service.MergeFileMd5(c.Request.Context(),md5, fileName)
 	if err != nil {
 		global.GVA_LOG.Error("md5读取失败!", zap.Any("err", err))
 		response.FailWithMessage("md5读取失败", c)

@@ -44,7 +44,7 @@ func BreakpointContinue(c *gin.Context) {
 		response.FailWithMessage("检查md5失败", c)
 		return
 	}
-	err, file := service.FindOrCreateFile(fileMd5, fileName, chunkTotal)
+	err, file := service.FindOrCreateFile(c.Request.Context(),fileMd5, fileName, chunkTotal)
 	if err != nil {
 		global.GVA_LOG.Error("查找或创建记录失败!", zap.Any("err", err))
 		response.FailWithMessage("查找或创建记录失败", c)
@@ -57,7 +57,7 @@ func BreakpointContinue(c *gin.Context) {
 		return
 	}
 
-	if err = service.CreateFileChunk(file.ID, pathc, chunkNumber); err != nil {
+	if err = service.CreateFileChunk(c.Request.Context(),file.ID, pathc, chunkNumber); err != nil {
 		global.GVA_LOG.Error("创建文件记录失败!", zap.Any("err", err))
 		response.FailWithMessage("创建文件记录失败", c)
 		return
@@ -77,7 +77,7 @@ func FindFile(c *gin.Context) {
 	fileMd5 := c.Query("fileMd5")
 	fileName := c.Query("fileName")
 	chunkTotal, _ := strconv.Atoi(c.Query("chunkTotal"))
-	err, file := service.FindOrCreateFile(fileMd5, fileName, chunkTotal)
+	err, file := service.FindOrCreateFile(c.Request.Context(),fileMd5, fileName, chunkTotal)
 	if err != nil {
 		global.GVA_LOG.Error("查找失败!", zap.Any("err", err))
 		response.FailWithMessage("查找失败", c)
@@ -119,7 +119,7 @@ func RemoveChunk(c *gin.Context) {
 	fileName := c.Query("fileName")
 	filePath := c.Query("filePath")
 	err := utils.RemoveChunk(fileMd5)
-	err = service.DeleteFileChunk(fileMd5, fileName, filePath)
+	err = service.DeleteFileChunk(c.Request.Context(),fileMd5, fileName, filePath)
 	if err != nil {
 		global.GVA_LOG.Error("缓存切片删除失败!", zap.Any("err", err))
 		response.FailWithDetailed(response.FilePathResponse{FilePath: filePath},"缓存切片删除失败", c)

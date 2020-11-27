@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"gin-vue-admin/global"
 	"gin-vue-admin/model"
@@ -44,8 +45,8 @@ func UpdateCasbin(authorityId string, casbinInfos []request.CasbinInfo) error {
 //@param: oldPath string, newPath string, oldMethod string, newMethod string
 //@return: error
 
-func UpdateCasbinApi(oldPath string, newPath string, oldMethod string, newMethod string) error {
-	err := global.GVA_DB.Table("casbin_rule").Model(&model.CasbinModel{}).Where("v1 = ? AND v2 = ?", oldPath, oldMethod).Updates(map[string]interface{}{
+func UpdateCasbinApi(ctx context.Context,oldPath string, newPath string, oldMethod string, newMethod string) error {
+	err := global.GVA_DB(ctx).Table("casbin_rule").Model(&model.CasbinModel{}).Where("v1 = ? AND v2 = ?", oldPath, oldMethod).Updates(map[string]interface{}{
 		"v1": newPath,
 		"v2": newMethod,
 	}).Error

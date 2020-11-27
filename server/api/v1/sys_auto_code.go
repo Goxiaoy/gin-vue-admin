@@ -30,7 +30,7 @@ func CreateTemp(c *gin.Context) {
 		return
 	}
 	if a.AutoCreateApiToSql {
-		if err := service.AutoCreateApi(&a); err != nil {
+		if err := service.AutoCreateApi(c.Request.Context(),&a); err != nil {
 			global.GVA_LOG.Error("自动化创建失败!请自行清空垃圾数据!", zap.Any("err", err))
 			c.Writer.Header().Add("success", "false")
 			c.Writer.Header().Add("msg", url.QueryEscape("自动化创建失败!请自行清空垃圾数据!"))
@@ -67,7 +67,7 @@ func CreateTemp(c *gin.Context) {
 // @Router /autoCode/getTables [get]
 func GetTables(c *gin.Context) {
 	dbName := c.DefaultQuery("dbName", global.GVA_CONFIG.Mysql.Dbname)
-	err, tables := service.GetTables(dbName)
+	err, tables := service.GetTables(c.Request.Context(),dbName)
 	if err != nil {
 		global.GVA_LOG.Error("查询table失败!", zap.Any("err", err))
 		response.FailWithMessage("查询table失败", c)
@@ -84,7 +84,7 @@ func GetTables(c *gin.Context) {
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /autoCode/getDatabase [get]
 func GetDB(c *gin.Context) {
-	if err, dbs := service.GetDB(); err != nil {
+	if err, dbs := service.GetDB(c.Request.Context(),); err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败", c)
 	} else {
@@ -102,7 +102,7 @@ func GetDB(c *gin.Context) {
 func GetColumn(c *gin.Context) {
 	dbName := c.DefaultQuery("dbName", global.GVA_CONFIG.Mysql.Dbname)
 	tableName := c.Query("tableName")
-	if err, columns := service.GetColumn(tableName, dbName); err != nil {
+	if err, columns := service.GetColumn(c.Request.Context(),tableName, dbName); err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败", c)
 	} else {

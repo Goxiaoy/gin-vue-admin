@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"gin-vue-admin/global"
@@ -17,8 +18,8 @@ import (
 //@param: uploader model.ExaSimpleUploader
 //@return: err error
 
-func SaveChunk(uploader model.ExaSimpleUploader) (err error) {
-	return global.GVA_DB.Create(uploader).Error
+func SaveChunk(ctx context.Context,uploader model.ExaSimpleUploader) (err error) {
+	return global.GVA_DB(ctx).Create(uploader).Error
 }
 
 //@author: [piexlmax](https://github.com/piexlmax)
@@ -27,9 +28,9 @@ func SaveChunk(uploader model.ExaSimpleUploader) (err error) {
 //@param: md5 string
 //@return: err error, uploads []model.ExaSimpleUploader, isDone bool
 
-func CheckFileMd5(md5 string) (err error, uploads []model.ExaSimpleUploader, isDone bool) {
-	err = global.GVA_DB.Find(&uploads, "identifier = ? AND is_done = ?", md5, false).Error
-	isDone = errors.Is(global.GVA_DB.First(&model.ExaSimpleUploader{}, "identifier = ? AND is_done = ?", md5, true).Error, gorm.ErrRecordNotFound)
+func CheckFileMd5(ctx context.Context,md5 string) (err error, uploads []model.ExaSimpleUploader, isDone bool) {
+	err = global.GVA_DB(ctx).Find(&uploads, "identifier = ? AND is_done = ?", md5, false).Error
+	isDone = errors.Is(global.GVA_DB(ctx).First(&model.ExaSimpleUploader{}, "identifier = ? AND is_done = ?", md5, true).Error, gorm.ErrRecordNotFound)
 	return err, uploads, !isDone
 }
 
@@ -39,11 +40,11 @@ func CheckFileMd5(md5 string) (err error, uploads []model.ExaSimpleUploader, isD
 //@param: md5 string, fileName string
 //@return: err error
 
-func MergeFileMd5(md5 string, fileName string) (err error) {
+func MergeFileMd5(ctx context.Context,md5 string, fileName string) (err error) {
 	finishDir := "./finish/"
 	dir := "./chunk/" + md5
 	//如果文件上传成功 不做后续操作 通知成功即可
-	if !errors.Is(global.GVA_DB.First(&model.ExaSimpleUploader{}, "identifier = ? AND is_done = ?", md5, true).Error, gorm.ErrRecordNotFound) {
+	if !errors.Is(global.GVA_DB(ctx).First(&model.ExaSimpleUploader{}, "identifier = ? AND is_done = ?", md5, true).Error, gorm.ErrRecordNotFound) {
 		return nil
 	}
 
@@ -66,7 +67,7 @@ func MergeFileMd5(md5 string, fileName string) (err error) {
 	if err != nil {
 		return err
 	}
-	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+	err = global.GVA_DB(ctx).Transaction(func(tx *gorm.DB) error {
 		//删除切片信息
 		if err = tx.Delete(&model.ExaSimpleUploader{}, "identifier = ? AND is_done = ?", md5, false).Error; err != nil {
 			fmt.Println(err)

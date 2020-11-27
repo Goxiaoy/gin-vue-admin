@@ -30,7 +30,7 @@ func Login(c *gin.Context) {
 	}
 	if store.Verify(L.CaptchaId, L.Captcha, true) {
 		U := &model.SysUser{Username: L.Username, Password: L.Password}
-		if err, user := service.Login(U); err != nil {
+		if err, user := service.Login(c.Request.Context(),U); err != nil {
 			global.GVA_LOG.Error("登陆失败! 用户名不存在或者密码错误", zap.Any("err", err))
 			response.FailWithMessage("用户名不存在或者密码错误", c)
 		} else {
@@ -88,7 +88,7 @@ func tokenNext(c *gin.Context, user model.SysUser) {
 	} else {
 		var blackJWT model.JwtBlacklist
 		blackJWT.Jwt = jwtStr
-		if err := service.JsonInBlacklist(blackJWT); err != nil {
+		if err := service.JsonInBlacklist(c.Request.Context(),blackJWT); err != nil {
 			response.FailWithMessage("jwt作废失败", c)
 			return
 		}
@@ -118,7 +118,7 @@ func Register(c *gin.Context) {
 		return
 	}
 	user := &model.SysUser{Username: R.Username, NickName: R.NickName, Password: R.Password, HeaderImg: R.HeaderImg, AuthorityId: R.AuthorityId}
-	err, userReturn := service.Register(*user)
+	err, userReturn := service.Register(c.Request.Context(),*user)
 	if err != nil {
 		global.GVA_LOG.Error("注册失败", zap.Any("err", err))
 		response.FailWithDetailed(response.SysUserResponse{User: userReturn}, "注册失败", c)
@@ -142,7 +142,7 @@ func ChangePassword(c *gin.Context) {
 		return
 	}
 	U := &model.SysUser{Username: user.Username, Password: user.Password}
-	if err, _ := service.ChangePassword(U, user.NewPassword); err != nil {
+	if err, _ := service.ChangePassword(c.Request.Context(),U, user.NewPassword); err != nil {
 		global.GVA_LOG.Error("修改失败", zap.Any("err", err))
 		response.FailWithMessage("修改失败，原密码与当前账户不符", c)
 	} else {
@@ -165,7 +165,7 @@ func GetUserList(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	if err, list, total := service.GetUserInfoList(pageInfo); err != nil {
+	if err, list, total := service.GetUserInfoList(c.Request.Context(),pageInfo); err != nil {
 		global.GVA_LOG.Error("获取失败", zap.Any("err", err))
 		response.FailWithMessage("获取失败", c)
 	} else {
@@ -193,7 +193,7 @@ func SetUserAuthority(c *gin.Context) {
 		response.FailWithMessage(UserVerifyErr.Error(), c)
 		return
 	}
-	if err := service.SetUserAuthority(sua.UUID, sua.AuthorityId); err != nil {
+	if err := service.SetUserAuthority(c.Request.Context(),sua.UUID, sua.AuthorityId); err != nil {
 		global.GVA_LOG.Error("修改失败", zap.Any("err", err))
 		response.FailWithMessage("修改失败", c)
 	} else {
@@ -221,7 +221,7 @@ func DeleteUser(c *gin.Context) {
 		response.FailWithMessage("删除失败, 自杀失败", c)
 		return
 	}
-	if err := service.DeleteUser(reqId.Id); err != nil {
+	if err := service.DeleteUser(c.Request.Context(),reqId.Id); err != nil {
 		global.GVA_LOG.Error("删除失败!", zap.Any("err", err))
 		response.FailWithMessage("删除失败", c)
 	} else {
@@ -244,7 +244,7 @@ func SetUserInfo(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	if err, ReqUser := service.SetUserInfo(user); err != nil {
+	if err, ReqUser := service.SetUserInfo(c.Request.Context(),user); err != nil {
 		global.GVA_LOG.Error("设置失败", zap.Any("err", err))
 		response.FailWithMessage("设置失败", c)
 	} else {

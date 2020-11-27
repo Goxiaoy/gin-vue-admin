@@ -27,7 +27,7 @@ func UploadFile(c *gin.Context) {
 		response.FailWithMessage("接收文件失败", c)
 		return
 	}
-	err, file = service.UploadFile(header, noSave) // 文件上传后拿到文件路径
+	err, file = service.UploadFile(c.Request.Context(),header, noSave) // 文件上传后拿到文件路径
 	if err != nil {
 		global.GVA_LOG.Error("修改数据库链接失败!", zap.Any("err", err))
 		response.FailWithMessage("修改数据库链接失败", c)
@@ -46,7 +46,7 @@ func UploadFile(c *gin.Context) {
 func DeleteFile(c *gin.Context) {
 	var file model.ExaFileUploadAndDownload
 	_ = c.ShouldBindJSON(&file)
-	if err := service.DeleteFile(file); err != nil {
+	if err := service.DeleteFile(c.Request.Context(),file); err != nil {
 		global.GVA_LOG.Error("删除失败!", zap.Any("err", err))
 		response.FailWithMessage("删除失败", c)
 		return
@@ -65,7 +65,7 @@ func DeleteFile(c *gin.Context) {
 func GetFileList(c *gin.Context) {
 	var pageInfo request.PageInfo
 	_ = c.ShouldBindJSON(&pageInfo)
-	err, list, total := service.GetFileRecordInfoList(pageInfo)
+	err, list, total := service.GetFileRecordInfoList(c.Request.Context(),pageInfo)
 	if err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败", c)

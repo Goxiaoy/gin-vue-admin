@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"gin-vue-admin/global"
 	"gin-vue-admin/model"
 )
@@ -11,7 +12,7 @@ import (
 //@param: wk model.SysWorkflow
 //@return: error
 
-func Create(wk model.SysWorkflow) error {
-	err := global.GVA_DB.Create(&wk).Error
+func Create(ctx context.Context,wk model.SysWorkflow) error {
+	err := global.GVA_DB(ctx).Create(&wk).Error
 	return err
 }

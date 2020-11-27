@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"gin-vue-admin/global"
 	"gin-vue-admin/model"
@@ -14,8 +15,8 @@ import (
 //@param: jwtList model.JwtBlacklist
 //@return: err error
 
-func JsonInBlacklist(jwtList model.JwtBlacklist) (err error) {
-	err = global.GVA_DB.Create(&jwtList).Error
+func JsonInBlacklist(ctx context.Context,jwtList model.JwtBlacklist) (err error) {
+	err = global.GVA_DB(ctx).Create(&jwtList).Error
 	return
 }
 
@@ -25,8 +26,8 @@ func JsonInBlacklist(jwtList model.JwtBlacklist) (err error) {
 //@param: jwt string
 //@return: bool
 
-func IsBlacklist(jwt string) bool {
-	isNotFound := errors.Is(global.GVA_DB.Where("jwt = ?", jwt).First(&model.JwtBlacklist{}).Error, gorm.ErrRecordNotFound)
+func IsBlacklist(ctx context.Context,jwt string) bool {
+	isNotFound := errors.Is(global.GVA_DB(ctx).Where("jwt = ?", jwt).First(&model.JwtBlacklist{}).Error, gorm.ErrRecordNotFound)
 	return !isNotFound
 }
 

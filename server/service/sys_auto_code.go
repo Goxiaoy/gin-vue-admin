@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"gin-vue-admin/global"
@@ -147,8 +148,8 @@ func GetAllTplFile(pathName string, fileList []string) ([]string, error) {
 //@param: fileList []string
 //@return: []string, error
 
-func GetTables(dbName string) (err error, TableNames []request.TableReq) {
-	err = global.GVA_DB.Raw("select table_name as table_name from information_schema.tables where table_schema = ?", dbName).Scan(&TableNames).Error
+func GetTables(ctx context.Context,dbName string) (err error, TableNames []request.TableReq) {
+	err = global.GVA_DB(ctx).Raw("select table_name as table_name from information_schema.tables where table_schema = ?", dbName).Scan(&TableNames).Error
 	return err, TableNames
 }
 
@@ -159,8 +160,8 @@ func GetTables(dbName string) (err error, TableNames []request.TableReq) {
 //@param: fileList []string
 //@return: []string, error
 
-func GetDB() (err error, DBNames []request.DBReq) {
-	err = global.GVA_DB.Raw("SELECT SCHEMA_NAME AS `database` FROM INFORMATION_SCHEMA.SCHEMATA;").Scan(&DBNames).Error
+func GetDB(ctx context.Context,) (err error, DBNames []request.DBReq) {
+	err = global.GVA_DB(ctx).Raw("SELECT SCHEMA_NAME AS `database` FROM INFORMATION_SCHEMA.SCHEMATA;").Scan(&DBNames).Error
 	return err, DBNames
 }
 
@@ -171,8 +172,8 @@ func GetDB() (err error, DBNames []request.DBReq) {
 //@param: fileList []string
 //@return: []string, error
 
-func GetColumn(tableName string, dbName string) (err error, Columns []request.ColumnReq) {
-	err = global.GVA_DB.Raw("SELECT COLUMN_NAME column_name,DATA_TYPE data_type,CASE DATA_TYPE WHEN 'longtext' THEN c.CHARACTER_MAXIMUM_LENGTH WHEN 'varchar' THEN c.CHARACTER_MAXIMUM_LENGTH WHEN 'double' THEN CONCAT_WS( ',', c.NUMERIC_PRECISION, c.NUMERIC_SCALE ) WHEN 'decimal' THEN CONCAT_WS( ',', c.NUMERIC_PRECISION, c.NUMERIC_SCALE ) WHEN 'int' THEN c.NUMERIC_PRECISION WHEN 'bigint' THEN c.NUMERIC_PRECISION ELSE '' END AS data_type_long,COLUMN_COMMENT column_comment FROM INFORMATION_SCHEMA.COLUMNS c WHERE table_name = ? AND table_schema = ?", tableName, dbName).Scan(&Columns).Error
+func GetColumn(ctx context.Context,tableName string, dbName string) (err error, Columns []request.ColumnReq) {
+	err = global.GVA_DB(ctx).Raw("SELECT COLUMN_NAME column_name,DATA_TYPE data_type,CASE DATA_TYPE WHEN 'longtext' THEN c.CHARACTER_MAXIMUM_LENGTH WHEN 'varchar' THEN c.CHARACTER_MAXIMUM_LENGTH WHEN 'double' THEN CONCAT_WS( ',', c.NUMERIC_PRECISION, c.NUMERIC_SCALE ) WHEN 'decimal' THEN CONCAT_WS( ',', c.NUMERIC_PRECISION, c.NUMERIC_SCALE ) WHEN 'int' THEN c.NUMERIC_PRECISION WHEN 'bigint' THEN c.NUMERIC_PRECISION ELSE '' END AS data_type_long,COLUMN_COMMENT column_comment FROM INFORMATION_SCHEMA.COLUMNS c WHERE table_name = ? AND table_schema = ?", tableName, dbName).Scan(&Columns).Error
 	return err, Columns
 }
 
@@ -216,7 +217,7 @@ func addAutoMoveFile(data *tplData) {
 //@param: a *model.AutoCodeStruct
 //@return: error
 
-func AutoCreateApi(a *model.AutoCodeStruct) (err error) {
+func AutoCreateApi(ctx context.Context,a *model.AutoCodeStruct) (err error) {
 	var apiList = []model.SysApi{
 		{
 			Path:        "/" + a.Abbreviation + "/" + "create" + a.StructName,
@@ -255,7 +256,7 @@ func AutoCreateApi(a *model.AutoCodeStruct) (err error) {
 			Method:      "GET",
 		},
 	}
-	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+	err = global.GVA_DB(ctx).Transaction(func(tx *gorm.DB) error {
 		for _, v := range apiList {
 			var api model.SysApi
 			if errors.Is(tx.Where("path = ? AND method = ?", v.Path, v.Method).First(&api).Error, gorm.ErrRecordNotFound) {

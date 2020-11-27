@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"gin-vue-admin/global"
 	"gin-vue-admin/model"
@@ -14,11 +15,11 @@ import (
 //@param: api model.SysApi
 //@return: err error
 
-func CreateApi(api model.SysApi) (err error) {
-	if !errors.Is(global.GVA_DB.Where("path = ? AND method = ?", api.Path, api.Method).First(&model.SysApi{}).Error, gorm.ErrRecordNotFound) {
+func CreateApi(ctx context.Context,api model.SysApi) (err error) {
+	if !errors.Is(global.GVA_DB(ctx).Where("path = ? AND method = ?", api.Path, api.Method).First(&model.SysApi{}).Error, gorm.ErrRecordNotFound) {
 		return errors.New("存在相同api")
 	}
-	return global.GVA_DB.Create(&api).Error
+	return global.GVA_DB(ctx).Create(&api).Error
 }
 
 //@author: [piexlmax](https://github.com/piexlmax)
@@ -27,8 +28,8 @@ func CreateApi(api model.SysApi) (err error) {
 //@param: api model.SysApi
 //@return: err error
 
-func DeleteApi(api model.SysApi) (err error) {
-	err = global.GVA_DB.Delete(api).Error
+func DeleteApi(ctx context.Context,api model.SysApi) (err error) {
+	err = global.GVA_DB(ctx).Delete(api).Error
 	ClearCasbin(1, api.Path, api.Method)
 	return err
 }
@@ -39,10 +40,10 @@ func DeleteApi(api model.SysApi) (err error) {
 //@param: api model.SysApi, info request.PageInfo, order string, desc bool
 //@return: err error
 
-func GetAPIInfoList(api model.SysApi, info request.PageInfo, order string, desc bool) (err error, list interface{}, total int64) {
+func GetAPIInfoList(ctx context.Context,api model.SysApi, info request.PageInfo, order string, desc bool) (err error, list interface{}, total int64) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
-	db := global.GVA_DB.Model(&model.SysApi{})
+	db := global.GVA_DB(ctx).Model(&model.SysApi{})
 	var apiList []model.SysApi
 
 	if api.Path != "" {
@@ -87,8 +88,8 @@ func GetAPIInfoList(api model.SysApi, info request.PageInfo, order string, desc 
 //@description: 获取所有的api
 //@return: err error, apis []model.SysApi
 
-func GetAllApis() (err error, apis []model.SysApi) {
-	err = global.GVA_DB.Find(&apis).Error
+func GetAllApis(ctx context.Context,) (err error, apis []model.SysApi) {
+	err = global.GVA_DB(ctx).Find(&apis).Error
 	return
 }
 
@@ -98,8 +99,8 @@ func GetAllApis() (err error, apis []model.SysApi) {
 //@param: id float64
 //@return: err error, api model.SysApi
 
-func GetApiById(id float64) (err error, api model.SysApi) {
-	err = global.GVA_DB.Where("id = ?", id).First(&api).Error
+func GetApiById(ctx context.Context,id float64) (err error, api model.SysApi) {
+	err = global.GVA_DB(ctx).Where("id = ?", id).First(&api).Error
 	return
 }
 
@@ -109,22 +110,22 @@ func GetApiById(id float64) (err error, api model.SysApi) {
 //@param: api model.SysApi
 //@return: err error
 
-func UpdateApi(api model.SysApi) (err error) {
+func UpdateApi(ctx context.Context,api model.SysApi) (err error) {
 	var oldA model.SysApi
-	err = global.GVA_DB.Where("id = ?", api.ID).First(&oldA).Error
+	err = global.GVA_DB(ctx).Where("id = ?", api.ID).First(&oldA).Error
 	if oldA.Path != api.Path || oldA.Method != api.Method {
-		if !errors.Is(global.GVA_DB.Where("path = ? AND method = ?", api.Path, api.Method).First(&model.SysApi{}).Error, gorm.ErrRecordNotFound) {
+		if !errors.Is(global.GVA_DB(ctx).Where("path = ? AND method = ?", api.Path, api.Method).First(&model.SysApi{}).Error, gorm.ErrRecordNotFound) {
 			return errors.New("存在相同api路径")
 		}
 	}
 	if err != nil {
 		return err
 	} else {
-		err = UpdateCasbinApi(oldA.Path, api.Path, oldA.Method, api.Method)
+		err = UpdateCasbinApi(ctx,oldA.Path, api.Path, oldA.Method, api.Method)
 		if err != nil {
 			return err
 		} else {
-			err = global.GVA_DB.Save(&api).Error
+			err = global.GVA_DB(ctx).Save(&api).Error
 		}
 	}
 	return err

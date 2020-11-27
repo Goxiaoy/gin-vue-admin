@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"gin-vue-admin/global"
 	"gin-vue-admin/model"
 	"gin-vue-admin/model/request"
@@ -12,8 +13,8 @@ import (
 //@param: sysOperationRecord model.SysOperationRecord
 //@return: err error
 
-func CreateSysOperationRecord(sysOperationRecord model.SysOperationRecord) (err error) {
-	err = global.GVA_DB.Create(&sysOperationRecord).Error
+func CreateSysOperationRecord(ctx context.Context,sysOperationRecord model.SysOperationRecord) (err error) {
+	err = global.GVA_DB(ctx).Create(&sysOperationRecord).Error
 	return err
 }
 
@@ -24,8 +25,8 @@ func CreateSysOperationRecord(sysOperationRecord model.SysOperationRecord) (err 
 //@param: ids request.IdsReq
 //@return: err error
 
-func DeleteSysOperationRecordByIds(ids request.IdsReq) (err error) {
-	err = global.GVA_DB.Delete(&[]model.SysOperationRecord{}, "id in (?)", ids.Ids).Error
+func DeleteSysOperationRecordByIds(ctx context.Context,ids request.IdsReq) (err error) {
+	err = global.GVA_DB(ctx).Delete(&[]model.SysOperationRecord{}, "id in (?)", ids.Ids).Error
 	return err
 }
 
@@ -35,8 +36,8 @@ func DeleteSysOperationRecordByIds(ids request.IdsReq) (err error) {
 //@param: sysOperationRecord model.SysOperationRecord
 //@return: err error
 
-func DeleteSysOperationRecord(sysOperationRecord model.SysOperationRecord) (err error) {
-	err = global.GVA_DB.Delete(sysOperationRecord).Error
+func DeleteSysOperationRecord(ctx context.Context,sysOperationRecord model.SysOperationRecord) (err error) {
+	err = global.GVA_DB(ctx).Delete(sysOperationRecord).Error
 	return err
 }
 
@@ -46,8 +47,8 @@ func DeleteSysOperationRecord(sysOperationRecord model.SysOperationRecord) (err 
 //@param: id uint
 //@return: err error, sysOperationRecord model.SysOperationRecord
 
-func GetSysOperationRecord(id uint) (err error, sysOperationRecord model.SysOperationRecord) {
-	err = global.GVA_DB.Where("id = ?", id).First(&sysOperationRecord).Error
+func GetSysOperationRecord(ctx context.Context,id uint) (err error, sysOperationRecord model.SysOperationRecord) {
+	err = global.GVA_DB(ctx).Where("id = ?", id).First(&sysOperationRecord).Error
 	return
 }
 
@@ -58,11 +59,11 @@ func GetSysOperationRecord(id uint) (err error, sysOperationRecord model.SysOper
 //@param: info request.SysOperationRecordSearch
 //@return: err error, list interface{}, total int64
 
-func GetSysOperationRecordInfoList(info request.SysOperationRecordSearch) (err error, list interface{}, total int64) {
+func GetSysOperationRecordInfoList(ctx context.Context,info request.SysOperationRecordSearch) (err error, list interface{}, total int64) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
-	db := global.GVA_DB.Model(&model.SysOperationRecord{})
+	db := global.GVA_DB(ctx).Model(&model.SysOperationRecord{})
 	var sysOperationRecords []model.SysOperationRecord
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.Method != "" {

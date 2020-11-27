@@ -22,7 +22,7 @@ import (
 func CreateSysDictionary(c *gin.Context) {
 	var dictionary model.SysDictionary
 	_ = c.ShouldBindJSON(&dictionary)
-	if err := service.CreateSysDictionary(dictionary); err != nil {
+	if err := service.CreateSysDictionary(c.Request.Context(),dictionary); err != nil {
 		global.GVA_LOG.Error("创建失败!", zap.Any("err", err))
 		response.FailWithMessage("创建失败", c)
 	} else {
@@ -41,7 +41,7 @@ func CreateSysDictionary(c *gin.Context) {
 func DeleteSysDictionary(c *gin.Context) {
 	var dictionary model.SysDictionary
 	_ = c.ShouldBindJSON(&dictionary)
-	if err := service.DeleteSysDictionary(dictionary); err != nil {
+	if err := service.DeleteSysDictionary(c.Request.Context(),dictionary); err != nil {
 		global.GVA_LOG.Error("删除失败!", zap.Any("err", err))
 		response.FailWithMessage("删除失败", c)
 	} else {
@@ -60,7 +60,7 @@ func DeleteSysDictionary(c *gin.Context) {
 func UpdateSysDictionary(c *gin.Context) {
 	var dictionary model.SysDictionary
 	_ = c.ShouldBindJSON(&dictionary)
-	if err := service.UpdateSysDictionary(&dictionary); err != nil {
+	if err := service.UpdateSysDictionary(c.Request.Context(),&dictionary); err != nil {
 		global.GVA_LOG.Error("更新失败!", zap.Any("err", err))
 		response.FailWithMessage("更新失败", c)
 	} else {
@@ -79,7 +79,7 @@ func UpdateSysDictionary(c *gin.Context) {
 func FindSysDictionary(c *gin.Context) {
 	var dictionary model.SysDictionary
 	_ = c.ShouldBindQuery(&dictionary)
-	if err, sysDictionary := service.GetSysDictionary(dictionary.Type, dictionary.ID); err != nil {
+	if err, sysDictionary := service.GetSysDictionary(c.Request.Context(),dictionary.Type, dictionary.ID); err != nil {
 		global.GVA_LOG.Error("查询失败!", zap.Any("err", err))
 		response.FailWithMessage("查询失败", c)
 	} else {
@@ -102,7 +102,7 @@ func GetSysDictionaryList(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	if err, list, total := service.GetSysDictionaryInfoList(pageInfo); err != nil {
+	if err, list, total := service.GetSysDictionaryInfoList(c.Request.Context(),pageInfo); err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败", c)
 	} else {

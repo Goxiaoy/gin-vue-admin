@@ -29,7 +29,7 @@ func CreateExaCustomer(c *gin.Context) {
 	}
 	customer.SysUserID = getUserID(c)
 	customer.SysUserAuthorityID = getUserAuthorityId(c)
-	if err := service.CreateExaCustomer(customer); err != nil {
+	if err := service.CreateExaCustomer(c.Request.Context(),customer); err != nil {
 		global.GVA_LOG.Error("创建失败!", zap.Any("err", err))
 		response.FailWithMessage("创建失败", c)
 	} else {
@@ -52,7 +52,7 @@ func DeleteExaCustomer(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	if err := service.DeleteExaCustomer(customer); err != nil {
+	if err := service.DeleteExaCustomer(c.Request.Context(),customer); err != nil {
 		global.GVA_LOG.Error("删除失败!", zap.Any("err", err))
 		response.FailWithMessage("删除失败", c)
 	} else {
@@ -79,7 +79,7 @@ func UpdateExaCustomer(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	if err := service.UpdateExaCustomer(&customer); err != nil {
+	if err := service.UpdateExaCustomer(c.Request.Context(),&customer); err != nil {
 		global.GVA_LOG.Error("更新失败!", zap.Any("err", err))
 		response.FailWithMessage("更新失败!", c)
 	} else {
@@ -102,7 +102,7 @@ func GetExaCustomer(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err, data := service.GetExaCustomer(customer.ID)
+	err, data := service.GetExaCustomer(c.Request.Context(),customer.ID)
 	if err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败", c)
@@ -126,7 +126,7 @@ func GetExaCustomerList(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err, customerList, total := service.GetCustomerInfoList(getUserAuthorityId(c), pageInfo)
+	err, customerList, total := service.GetCustomerInfoList(c.Request.Context(),getUserAuthorityId(c), pageInfo)
 	if err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage(fmt.Sprintf("获取失败：%v", err), c)

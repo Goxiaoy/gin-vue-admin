@@ -65,7 +65,7 @@ func OperationRecord() gin.HandlerFunc {
 		record.Latency = latency
 		record.Resp = writer.body.String()
 
-		if err := service.CreateSysOperationRecord(record); err != nil {
+		if err := service.CreateSysOperationRecord(c.Request.Context(),record); err != nil {
 			global.GVA_LOG.Error("create operation record error:", zap.Any("err", err))
 		}
 	}

@@ -13,7 +13,7 @@ import (
 //@return: err error
 
 func Create{{.StructName}}({{.Abbreviation}} model.{{.StructName}}) (err error) {
-	err = global.GVA_DB.Create(&{{.Abbreviation}}).Error
+	err = global.GVA_DB(ctx).Create(&{{.Abbreviation}}).Error
 	return err
 }
 
@@ -24,7 +24,7 @@ func Create{{.StructName}}({{.Abbreviation}} model.{{.StructName}}) (err error) 
 //@return: err error
 
 func Delete{{.StructName}}({{.Abbreviation}} model.{{.StructName}}) (err error) {
-	err = global.GVA_DB.Delete({{.Abbreviation}}).Error
+	err = global.GVA_DB(ctx).Delete({{.Abbreviation}}).Error
 	return err
 }
 
@@ -35,7 +35,7 @@ func Delete{{.StructName}}({{.Abbreviation}} model.{{.StructName}}) (err error) 
 //@return: err error
 
 func Delete{{.StructName}}ByIds(ids request.IdsReq) (err error) {
-	err = global.GVA_DB.Delete(&[]model.{{.StructName}}{},"id in ?",ids.Ids).Error
+	err = global.GVA_DB(ctx).Delete(&[]model.{{.StructName}}{},"id in ?",ids.Ids).Error
 	return err
 }
 
@@ -46,7 +46,7 @@ func Delete{{.StructName}}ByIds(ids request.IdsReq) (err error) {
 //@return: err error
 
 func Update{{.StructName}}({{.Abbreviation}} *model.{{.StructName}}) (err error) {
-	err = global.GVA_DB.Save({{.Abbreviation}}).Error
+	err = global.GVA_DB(ctx).Save({{.Abbreviation}}).Error
 	return err
 }
 
@@ -57,7 +57,7 @@ func Update{{.StructName}}({{.Abbreviation}} *model.{{.StructName}}) (err error)
 //@return: err error, {{.Abbreviation}} model.{{.StructName}}
 
 func Get{{.StructName}}(id uint) (err error, {{.Abbreviation}} model.{{.StructName}}) {
-	err = global.GVA_DB.Where("id = ?", id).First(&{{.Abbreviation}}).Error
+	err = global.GVA_DB(ctx).Where("id = ?", id).First(&{{.Abbreviation}}).Error
 	return
 }
 
@@ -71,7 +71,7 @@ func Get{{.StructName}}InfoList(info request.{{.StructName}}Search) (err error, 
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
     // 创建db
-	db := global.GVA_DB.Model(&model.{{.StructName}}{})
+	db := global.GVA_DB(ctx).Model(&model.{{.StructName}}{})
     var {{.Abbreviation}}s []model.{{.StructName}}
     // 如果有条件搜索 下方会自动创建搜索语句
         {{- range .Fields}}

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"gin-vue-admin/global"
 	"gin-vue-admin/model"
 	"gin-vue-admin/model/request"
@@ -12,8 +13,8 @@ import (
 //@param: e model.ExaCustomer
 //@return: err error
 
-func CreateExaCustomer(e model.ExaCustomer) (err error) {
-	err = global.GVA_DB.Create(&e).Error
+func CreateExaCustomer(ctx context.Context,e model.ExaCustomer) (err error) {
+	err = global.GVA_DB(ctx).Create(&e).Error
 	return err
 }
 
@@ -23,8 +24,8 @@ func CreateExaCustomer(e model.ExaCustomer) (err error) {
 //@param: e model.ExaCustomer
 //@return: err error
 
-func DeleteExaCustomer(e model.ExaCustomer) (err error) {
-	err = global.GVA_DB.Delete(e).Error
+func DeleteExaCustomer(ctx context.Context,e model.ExaCustomer) (err error) {
+	err = global.GVA_DB(ctx).Delete(e).Error
 	return err
 }
 
@@ -34,8 +35,8 @@ func DeleteExaCustomer(e model.ExaCustomer) (err error) {
 //@param: e *model.ExaCustomer
 //@return: err error
 
-func UpdateExaCustomer(e *model.ExaCustomer) (err error) {
-	err = global.GVA_DB.Save(e).Error
+func UpdateExaCustomer(ctx context.Context,e *model.ExaCustomer) (err error) {
+	err = global.GVA_DB(ctx).Save(e).Error
 	return err
 }
 
@@ -45,8 +46,8 @@ func UpdateExaCustomer(e *model.ExaCustomer) (err error) {
 //@param: id uint
 //@return: err error, customer model.ExaCustomer
 
-func GetExaCustomer(id uint) (err error, customer model.ExaCustomer) {
-	err = global.GVA_DB.Where("id = ?", id).First(&customer).Error
+func GetExaCustomer(ctx context.Context,id uint) (err error, customer model.ExaCustomer) {
+	err = global.GVA_DB(ctx).Where("id = ?", id).First(&customer).Error
 	return
 }
 
@@ -56,13 +57,13 @@ func GetExaCustomer(id uint) (err error, customer model.ExaCustomer) {
 //@param: sysUserAuthorityID string, info request.PageInfo
 //@return: err error, list interface{}, total int64
 
-func GetCustomerInfoList(sysUserAuthorityID string, info request.PageInfo) (err error, list interface{}, total int64) {
+func GetCustomerInfoList(ctx context.Context,sysUserAuthorityID string, info request.PageInfo) (err error, list interface{}, total int64) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
-	db := global.GVA_DB.Model(&model.ExaCustomer{})
+	db := global.GVA_DB(ctx).Model(&model.ExaCustomer{})
 	var a model.SysAuthority
 	a.AuthorityId = sysUserAuthorityID
-	err, auth := GetAuthorityInfo(a)
+	err, auth := GetAuthorityInfo(ctx,a)
 	var dataId []string
 	for _, v := range auth.DataAuthorityId {
 		dataId = append(dataId, v.AuthorityId)

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"gin-vue-admin/global"
 	"gin-vue-admin/model"
@@ -13,14 +14,14 @@ import (
 //@param: id float64
 //@return: err error
 
-func DeleteBaseMenu(id float64) (err error) {
-	err = global.GVA_DB.Preload("Parameters").Where("parent_id = ?", id).First(&model.SysBaseMenu{}).Error
+func DeleteBaseMenu(ctx context.Context,id float64) (err error) {
+	err = global.GVA_DB(ctx).Preload("Parameters").Where("parent_id = ?", id).First(&model.SysBaseMenu{}).Error
 	if err != nil {
 		var menu model.SysBaseMenu
-		db := global.GVA_DB.Preload("SysAuthoritys").Where("id = ?", id).First(&menu).Delete(&menu)
-		err = global.GVA_DB.Delete(&model.SysBaseMenuParameter{}, "sys_base_menu_id = ?", id).Error
+		db := global.GVA_DB(ctx).Preload("SysAuthoritys").Where("id = ?", id).First(&menu).Delete(&menu)
+		err = global.GVA_DB(ctx).Delete(&model.SysBaseMenuParameter{}, "sys_base_menu_id = ?", id).Error
 		if len(menu.SysAuthoritys) > 0 {
-			err = global.GVA_DB.Model(&menu).Association("SysAuthoritys").Delete(&menu.SysAuthoritys)
+			err = global.GVA_DB(ctx).Model(&menu).Association("SysAuthoritys").Delete(&menu.SysAuthoritys)
 		} else {
 			err = db.Error
 		}
@@ -36,7 +37,7 @@ func DeleteBaseMenu(id float64) (err error) {
 //@param: menu model.SysBaseMenu
 //@return:err error
 
-func UpdateBaseMenu(menu model.SysBaseMenu) (err error) {
+func UpdateBaseMenu(ctx context.Context,menu model.SysBaseMenu) (err error) {
 	var oldMenu model.SysBaseMenu
 	upDateMap := make(map[string]interface{})
 	upDateMap["keep_alive"] = menu.KeepAlive
@@ -50,7 +51,7 @@ func UpdateBaseMenu(menu model.SysBaseMenu) (err error) {
 	upDateMap["icon"] = menu.Icon
 	upDateMap["sort"] = menu.Sort
 
-	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+	err = global.GVA_DB(ctx).Transaction(func(tx *gorm.DB) error {
 		db := tx.Where("id = ?", menu.ID).Find(&oldMenu)
 		if oldMenu.Name != menu.Name {
 			if !errors.Is(tx.Where("id <> ? AND name = ?", menu.ID, menu.Name).First(&model.SysBaseMenu{}).Error, gorm.ErrRecordNotFound) {
@@ -90,7 +91,7 @@ func UpdateBaseMenu(menu model.SysBaseMenu) (err error) {
 //@param: id float64
 //@return: err error, menu model.SysBaseMenu
 
-func GetBaseMenuById(id float64) (err error, menu model.SysBaseMenu) {
-	err = global.GVA_DB.Preload("Parameters").Where("id = ?", id).First(&menu).Error
+func GetBaseMenuById(ctx context.Context,id float64) (err error, menu model.SysBaseMenu) {
+	err = global.GVA_DB(ctx).Preload("Parameters").Where("id = ?", id).First(&menu).Error
 	return
 }

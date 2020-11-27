@@ -16,6 +16,7 @@ limitations under the License.
 package gva
 
 import (
+	"context"
 	"gin-vue-admin/cmd/datas"
 	"gin-vue-admin/core"
 	"gin-vue-admin/initialize"
@@ -45,7 +46,8 @@ var initdbCmd = &cobra.Command{
 		switch global.GVA_CONFIG.System.DbType {
 		case "mysql":
 			datas.InitMysqlTables(db)
-			datas.InitMysqlData(db)
+			//TODO read config from params
+			datas.InitMysqlData(context.Background(),db)
 		case "postgresql":
 			color.Info.Println("postgresql功能开发中")
 		case "sqlite":
@@ -54,7 +56,7 @@ var initdbCmd = &cobra.Command{
 			color.Info.Println("sqlserver功能开发中")
 		default:
 			datas.InitMysqlTables(db)
-			datas.InitMysqlData(db)
+			datas.InitMysqlData(context.Background(),db)
 		}
 		frame, _ := cmd.Flags().GetString("frame")
 		if frame == "gf" {

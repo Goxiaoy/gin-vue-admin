@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"gin-vue-admin/global"
 	"gin-vue-admin/model"
@@ -15,10 +16,10 @@ import (
 //@param: authorityId string
 //@return: err error, treeMap map[string][]model.SysMenu
 
-func getMenuTreeMap(authorityId string) (err error, treeMap map[string][]model.SysMenu) {
+func getMenuTreeMap(ctx context.Context,authorityId string) (err error, treeMap map[string][]model.SysMenu) {
 	var allMenus []model.SysMenu
 	treeMap = make(map[string][]model.SysMenu)
-	err = global.GVA_DB.Where("authority_id = ?", authorityId).Order("sort").Preload("Parameters").Find(&allMenus).Error
+	err = global.GVA_DB(ctx).Where("authority_id = ?", authorityId).Order("sort").Preload("Parameters").Find(&allMenus).Error
 	for _, v := range allMenus {
 		treeMap[v.ParentId] = append(treeMap[v.ParentId], v)
 	}
@@ -31,8 +32,8 @@ func getMenuTreeMap(authorityId string) (err error, treeMap map[string][]model.S
 //@param: authorityId string
 //@return: err error, menus []model.SysMenu
 
-func GetMenuTree(authorityId string) (err error, menus []model.SysMenu) {
-	err, menuTree := getMenuTreeMap(authorityId)
+func GetMenuTree(ctx context.Context,authorityId string) (err error, menus []model.SysMenu) {
+	err, menuTree := getMenuTreeMap(ctx,authorityId)
 	menus = menuTree["0"]
 	for i := 0; i < len(menus); i++ {
 		err = getChildrenList(&menus[i], menuTree)
@@ -59,9 +60,9 @@ func getChildrenList(menu *model.SysMenu, treeMap map[string][]model.SysMenu) (e
 //@description: 获取路由分页
 //@return: err error, list interface{}, total int64
 
-func GetInfoList() (err error, list interface{}, total int64) {
+func GetInfoList(ctx context.Context) (err error, list interface{}, total int64) {
 	var menuList []model.SysBaseMenu
-	err, treeMap := getBaseMenuTreeMap()
+	err, treeMap := getBaseMenuTreeMap(ctx)
 	menuList = treeMap["0"]
 	for i := 0; i < len(menuList); i++ {
 		err = getBaseChildrenList(&menuList[i], treeMap)
@@ -89,11 +90,11 @@ func getBaseChildrenList(menu *model.SysBaseMenu, treeMap map[string][]model.Sys
 //@param: menu model.SysBaseMenu
 //@return: err error
 
-func AddBaseMenu(menu model.SysBaseMenu) (err error) {
-	if !errors.Is(global.GVA_DB.Where("name = ?", menu.Name).First(&model.SysBaseMenu{}).Error, gorm.ErrRecordNotFound) {
+func AddBaseMenu(ctx context.Context,menu model.SysBaseMenu) (err error) {
+	if !errors.Is(global.GVA_DB(ctx).Where("name = ?", menu.Name).First(&model.SysBaseMenu{}).Error, gorm.ErrRecordNotFound) {
 		err = errors.New("存在重复name，请修改name")
 	}
-	err = global.GVA_DB.Create(&menu).Error
+	err = global.GVA_DB(ctx).Create(&menu).Error
 	return err
 }
 
@@ -102,10 +103,10 @@ func AddBaseMenu(menu model.SysBaseMenu) (err error) {
 //@description: 获取路由总树map
 //@return: err error, treeMap map[string][]model.SysBaseMenu
 
-func getBaseMenuTreeMap() (err error, treeMap map[string][]model.SysBaseMenu) {
+func getBaseMenuTreeMap(ctx context.Context,) (err error, treeMap map[string][]model.SysBaseMenu) {
 	var allMenus []model.SysBaseMenu
 	treeMap = make(map[string][]model.SysBaseMenu)
-	err = global.GVA_DB.Order("sort").Preload("Parameters").Find(&allMenus).Error
+	err = global.GVA_DB(ctx).Order("sort").Preload("Parameters").Find(&allMenus).Error
 	for _, v := range allMenus {
 		treeMap[v.ParentId] = append(treeMap[v.ParentId], v)
 	}
@@ -117,8 +118,8 @@ func getBaseMenuTreeMap() (err error, treeMap map[string][]model.SysBaseMenu) {
 //@description: 获取基础路由树
 //@return: err error, menus []model.SysBaseMenu
 
-func GetBaseMenuTree() (err error, menus []model.SysBaseMenu) {
-	err, treeMap := getBaseMenuTreeMap()
+func GetBaseMenuTree(ctx context.Context,) (err error, menus []model.SysBaseMenu) {
+	err, treeMap := getBaseMenuTreeMap(ctx)
 	menus = treeMap["0"]
 	for i := 0; i < len(menus); i++ {
 		err = getBaseChildrenList(&menus[i], treeMap)
@@ -132,11 +133,11 @@ func GetBaseMenuTree() (err error, menus []model.SysBaseMenu) {
 //@param: menus []model.SysBaseMenu, authorityId string
 //@return: err error
 
-func AddMenuAuthority(menus []model.SysBaseMenu, authorityId string) (err error) {
+func AddMenuAuthority(ctx context.Context,menus []model.SysBaseMenu, authorityId string) (err error) {
 	var auth model.SysAuthority
 	auth.AuthorityId = authorityId
 	auth.SysBaseMenus = menus
-	err = SetMenuAuthority(&auth)
+	err = SetMenuAuthority(ctx,&auth)
 	return err
 }
 
@@ -146,9 +147,9 @@ func AddMenuAuthority(menus []model.SysBaseMenu, authorityId string) (err error)
 //@param: info *request.GetAuthorityId
 //@return: err error, menus []model.SysMenu
 
-func GetMenuAuthority(info *request.GetAuthorityId) (err error, menus []model.SysMenu) {
-	err = global.GVA_DB.Where("authority_id = ? ", info.AuthorityId).Order("sort").Find(&menus).Error
+func GetMenuAuthority(ctx context.Context,info *request.GetAuthorityId) (err error, menus []model.SysMenu) {
+	err = global.GVA_DB(ctx).Where("authority_id = ? ", info.AuthorityId).Order("sort").Find(&menus).Error
 	//sql := "SELECT authority_menu.keep_alive,authority_menu.default_menu,authority_menu.created_at,authority_menu.updated_at,authority_menu.deleted_at,authority_menu.menu_level,authority_menu.parent_id,authority_menu.path,authority_menu.`name`,authority_menu.hidden,authority_menu.component,authority_menu.title,authority_menu.icon,authority_menu.sort,authority_menu.menu_id,authority_menu.authority_id FROM authority_menu WHERE authority_menu.authority_id = ? ORDER BY authority_menu.sort ASC"
-	//err = global.GVA_DB.Raw(sql, authorityId).Scan(&menus).Error
+	//err = global.GVA_DB(ctx).Raw(sql, authorityId).Scan(&menus).Error
 	return err, menus
 }

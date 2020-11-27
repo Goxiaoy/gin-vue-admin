@@ -1,26 +1,41 @@
 package datas
 
 import (
+	"context"
 	"gin-vue-admin/model"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
 	"github.com/gookit/color"
+	"github.com/goxiaoy/go-saas/common"
+	sg "github.com/goxiaoy/go-saas/gorm"
 	"gorm.io/gorm"
 	"os"
 )
 
-func InitMysqlData(db *gorm.DB) {
+func InitMysqlData(ctx context.Context,db *gorm.DB) {
+	tenantId := common.FromCurrentTenant(ctx).Id
+	var tenant sg.HasTenant
+	if tenantId==""{
+		tenant = sg.HasTenant{
+			Valid: false,
+		}
+	}else{
+		tenant = sg.HasTenant{
+			String: tenantId,
+			Valid: true,
+		}
+	}
 	InitSysApi(db)
-	InitSysUser(db)
-	InitExaCustomer(db)
+	InitSysUser(tenant,db)
+	InitExaCustomer(tenant,db)
 	InitCasbinModel(db)
-	InitSysAuthority(db)
+	InitSysAuthority(tenant,db)
 	InitSysBaseMenus(db)
-	InitAuthorityMenu(db)
-	InitSysDictionary(db)
+	InitAuthorityMenu(tenant,db)
+	InitSysDictionary(tenant,db)
 	InitSysAuthorityMenus(db)
 	InitSysDataAuthorityId(db)
-	InitSysDictionaryDetail(db)
-	InitExaFileUploadAndDownload(db)
+	InitSysDictionaryDetail(tenant,db)
+	InitExaFileUploadAndDownload(tenant,db)
 }
 
 func InitMysqlTables(db *gorm.DB) {

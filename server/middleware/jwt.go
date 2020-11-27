@@ -23,7 +23,7 @@ func JWTAuth() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		if service.IsBlacklist(token) {
+		if service.IsBlacklist(c.Request.Context(),token) {
 			response.FailWithDetailed(gin.H{"reload": true}, "您的帐户异地登陆或令牌失效", c)
 			c.Abort()
 			return
@@ -41,8 +41,8 @@ func JWTAuth() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		if err, _ = service.FindUserByUuid(claims.UUID.String()); err != nil {
-			_ = service.JsonInBlacklist(model.JwtBlacklist{Jwt: token})
+		if err, _ = service.FindUserByUuid(c.Request.Context(),claims.UUID.String()); err != nil {
+			_ = service.JsonInBlacklist(c.Request.Context(),model.JwtBlacklist{Jwt: token})
 			response.FailWithDetailed(gin.H{"reload": true}, err.Error(), c)
 			c.Abort()
 		}
@@ -57,7 +57,7 @@ func JWTAuth() gin.HandlerFunc {
 				if err != nil {
 					global.GVA_LOG.Error("get redis jwt failed", zap.Any("err", err))
 				} else { // 当之前的取成功时才进行拉黑操作
-					_ = service.JsonInBlacklist(model.JwtBlacklist{Jwt: RedisJwtToken})
+					_ = service.JsonInBlacklist(c.Request.Context(),model.JwtBlacklist{Jwt: RedisJwtToken})
 				}
 				// 无论如何都要记录当前的活跃状态
 				_ = service.SetRedisJWT(newToken, newClaims.Username)

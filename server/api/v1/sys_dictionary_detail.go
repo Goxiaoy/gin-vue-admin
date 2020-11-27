@@ -22,7 +22,7 @@ import (
 func CreateSysDictionaryDetail(c *gin.Context) {
 	var detail model.SysDictionaryDetail
 	_ = c.ShouldBindJSON(&detail)
-	if err := service.CreateSysDictionaryDetail(detail); err != nil {
+	if err := service.CreateSysDictionaryDetail(c.Request.Context(),detail); err != nil {
 		global.GVA_LOG.Error("创建失败!", zap.Any("err", err))
 		response.FailWithMessage("创建失败", c)
 	} else {
@@ -41,7 +41,7 @@ func CreateSysDictionaryDetail(c *gin.Context) {
 func DeleteSysDictionaryDetail(c *gin.Context) {
 	var detail model.SysDictionaryDetail
 	_ = c.ShouldBindJSON(&detail)
-	if err := service.DeleteSysDictionaryDetail(detail); err != nil {
+	if err := service.DeleteSysDictionaryDetail(c.Request.Context(),detail); err != nil {
 		global.GVA_LOG.Error("删除失败!", zap.Any("err", err))
 		response.FailWithMessage("删除失败", c)
 	} else {
@@ -60,7 +60,7 @@ func DeleteSysDictionaryDetail(c *gin.Context) {
 func UpdateSysDictionaryDetail(c *gin.Context) {
 	var detail model.SysDictionaryDetail
 	_ = c.ShouldBindJSON(&detail)
-	if err := service.UpdateSysDictionaryDetail(&detail); err != nil {
+	if err := service.UpdateSysDictionaryDetail(c.Request.Context(),&detail); err != nil {
 		global.GVA_LOG.Error("更新失败!", zap.Any("err", err))
 		response.FailWithMessage("更新失败", c)
 	} else {
@@ -83,7 +83,7 @@ func FindSysDictionaryDetail(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	if err, resysDictionaryDetail := service.GetSysDictionaryDetail(detail.ID); err != nil {
+	if err, resysDictionaryDetail := service.GetSysDictionaryDetail(c.Request.Context(),detail.ID); err != nil {
 		global.GVA_LOG.Error("查询失败!", zap.Any("err", err))
 		response.FailWithMessage("查询失败", c)
 	} else {
@@ -102,7 +102,7 @@ func FindSysDictionaryDetail(c *gin.Context) {
 func GetSysDictionaryDetailList(c *gin.Context) {
 	var pageInfo request.SysDictionaryDetailSearch
 	_ = c.ShouldBindQuery(&pageInfo)
-	if err, list, total := service.GetSysDictionaryDetailInfoList(pageInfo); err != nil {
+	if err, list, total := service.GetSysDictionaryDetailInfoList(c.Request.Context(),pageInfo); err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败", c)
 	} else {

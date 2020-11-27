@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"gin-vue-admin/global"
 	"gin-vue-admin/model"
@@ -16,8 +17,8 @@ import (
 //@param: file model.ExaFileUploadAndDownload
 //@return: error
 
-func Upload(file model.ExaFileUploadAndDownload) error {
-	return global.GVA_DB.Create(&file).Error
+func Upload(ctx context.Context,file model.ExaFileUploadAndDownload) error {
+	return global.GVA_DB(ctx).Create(&file).Error
 }
 
 //@author: [piexlmax](https://github.com/piexlmax)
@@ -26,9 +27,9 @@ func Upload(file model.ExaFileUploadAndDownload) error {
 //@param: id uint
 //@return: error, model.ExaFileUploadAndDownload
 
-func FindFile(id uint) (error, model.ExaFileUploadAndDownload) {
+func FindFile(ctx context.Context,id uint) (error, model.ExaFileUploadAndDownload) {
 	var file model.ExaFileUploadAndDownload
-	err := global.GVA_DB.Where("id = ?", id).First(&file).Error
+	err := global.GVA_DB(ctx).Where("id = ?", id).First(&file).Error
 	return err, file
 }
 
@@ -38,14 +39,14 @@ func FindFile(id uint) (error, model.ExaFileUploadAndDownload) {
 //@param: file model.ExaFileUploadAndDownload
 //@return: err error
 
-func DeleteFile(file model.ExaFileUploadAndDownload) (err error) {
+func DeleteFile(ctx context.Context,file model.ExaFileUploadAndDownload) (err error) {
 	var fileFromDb model.ExaFileUploadAndDownload
-	err, fileFromDb = FindFile(file.ID)
+	err, fileFromDb = FindFile(ctx,file.ID)
 	oss := upload.NewOss()
 	if err = oss.DeleteFile(fileFromDb.Key); err != nil{
 		return errors.New("文件删除失败")
 	}
-	err = global.GVA_DB.Where("id = ?", file.ID).Unscoped().Delete(file).Error
+	err = global.GVA_DB(ctx).Where("id = ?", file.ID).Unscoped().Delete(file).Error
 	return err
 }
 
@@ -55,10 +56,10 @@ func DeleteFile(file model.ExaFileUploadAndDownload) (err error) {
 //@param: info request.PageInfo
 //@return: err error, list interface{}, total int64
 
-func GetFileRecordInfoList(info request.PageInfo) (err error, list interface{}, total int64) {
+func GetFileRecordInfoList(ctx context.Context,info request.PageInfo) (err error, list interface{}, total int64) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
-	db := global.GVA_DB
+	db := global.GVA_DB(ctx)
 	var fileLists []model.ExaFileUploadAndDownload
 	err = db.Find(&fileLists).Count(&total).Error
 	err = db.Limit(limit).Offset(offset).Order("updated_at desc").Find(&fileLists).Error
@@ -71,7 +72,7 @@ func GetFileRecordInfoList(info request.PageInfo) (err error, list interface{}, 
 //@param: header *multipart.FileHeader, noSave string
 //@return: err error, file model.ExaFileUploadAndDownload
 
-func UploadFile(header *multipart.FileHeader, noSave string) (err error, file model.ExaFileUploadAndDownload) {
+func UploadFile(ctx context.Context,header *multipart.FileHeader, noSave string) (err error, file model.ExaFileUploadAndDownload) {
 	oss := upload.NewOss()
 	filePath, key, uploadErr := oss.UploadFile(header)
 	if uploadErr != nil {
@@ -85,7 +86,7 @@ func UploadFile(header *multipart.FileHeader, noSave string) (err error, file mo
 			Tag:  s[len(s)-1],
 			Key:  key,
 		}
-		return Upload(f), f
+		return Upload(ctx,f), f
 	}
 	return
 }

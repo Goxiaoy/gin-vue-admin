@@ -1,7 +1,9 @@
 package global
 
 import (
+	"context"
 	"github.com/goxiaoy/go-saas/common"
+	"github.com/goxiaoy/go-saas/data"
 	sg "github.com/goxiaoy/go-saas/gorm"
 	"go.uber.org/zap"
 
@@ -12,7 +14,6 @@ import (
 )
 
 var (
-	GVA_DB     *gorm.DB
 	GVA_REDIS  *redis.Client
 	GVA_CONFIG config.Server
 	GVA_VP     *viper.Viper
@@ -26,3 +27,8 @@ var (
 	GVA_DB_CLEAN sg.DbClean
 
 )
+
+func GVA_DB(ctx context.Context) *gorm.DB {
+	//just get default db
+	return GVA_DB_PROVIDER.Get(ctx,data.Default)
+}
