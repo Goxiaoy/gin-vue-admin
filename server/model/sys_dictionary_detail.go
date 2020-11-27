@@ -3,6 +3,7 @@ package model
 
 import (
 	"gin-vue-admin/global"
+	sg "github.com/goxiaoy/go-saas/gorm"
 )
 
 // 如果含有time.Time 请自行import time包
@@ -13,4 +14,5 @@ type SysDictionaryDetail struct {
 	Status          *bool  `json:"status" form:"status" gorm:"column:status;comment:启用状态"`
 	Sort            int    `json:"sort" form:"sort" gorm:"column:sort;comment:排序标记"`
 	SysDictionaryID int    `json:"sysDictionaryID" form:"sysDictionaryID" gorm:"column:sys_dictionary_id;comment:关联标记"`
+	sg.HasTenant
 }

@@ -2,6 +2,7 @@ package model
 
 import (
 	"gin-vue-admin/global"
+	sg "github.com/goxiaoy/go-saas/gorm"
 )
 
 // file struct, 文件结构体
@@ -13,6 +14,7 @@ type ExaFile struct {
 	ExaFileChunk []ExaFileChunk
 	ChunkTotal   int
 	IsFinish     bool
+	sg.HasTenant
 }
 
 // file chunk struct, 切片结构体
@@ -21,4 +23,5 @@ type ExaFileChunk struct {
 	ExaFileID       uint
 	FileChunkNumber int
 	FileChunkPath   string
+	sg.HasTenant
 }

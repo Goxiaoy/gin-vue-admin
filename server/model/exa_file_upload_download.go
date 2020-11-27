@@ -2,6 +2,7 @@ package model
 
 import (
 	"gin-vue-admin/global"
+	sg "github.com/goxiaoy/go-saas/gorm"
 )
 
 type ExaFileUploadAndDownload struct {
@@ -10,4 +11,5 @@ type ExaFileUploadAndDownload struct {
 	Url  string `json:"url" gorm:"comment:文件地址"`
 	Tag  string `json:"tag" gorm:"comment:文件标签"`
 	Key  string `json:"key" gorm:"comment:编号"`
+	sg.HasTenant
 }

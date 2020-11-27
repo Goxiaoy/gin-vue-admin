@@ -2,6 +2,7 @@ package model
 
 import (
 	"gin-vue-admin/global"
+	sg "github.com/goxiaoy/go-saas/gorm"
 )
 
 // 工作流属性表
@@ -11,6 +12,7 @@ type SysWorkflow struct {
 	WorkflowName        string                `json:"workflowName" gorm:"comment:工作流英文名称"`      // 工作流英文id
 	WorkflowDescription string                `json:"workflowDescription" gorm:"comment:工作流描述"` // 工作流描述
 	WorkflowStepInfo    []SysWorkflowStepInfo `json:"workflowStep" gorm:"comment:工作流步骤"`        // 工作流步骤
+	sg.HasTenant
 }
 
 // 工作流状态表
@@ -22,4 +24,5 @@ type SysWorkflowStepInfo struct {
 	StepNo          float64 `json:"stepNo" gorm:"comment:步骤id （第几步）"`       // 步骤id （第几步）
 	StepAuthorityID string  `json:"stepAuthorityID" gorm:"comment:操作者级别id"` // 操作者级别id
 	IsEnd           bool    `json:"isEnd" gorm:"comment:是否是完结流节点"`          // 是否是完结流节点
+	sg.HasTenant
 }
