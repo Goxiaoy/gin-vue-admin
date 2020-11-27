@@ -12,5 +12,5 @@ type ExaCustomer struct {
 	SysUserID          uint    `json:"sysUserId" form:"sysUserId" gorm:"comment:管理ID"`
 	SysUserAuthorityID string  `json:"sysUserAuthorityID" form:"sysUserAuthorityID" gorm:"comment:管理角色ID"`
 	SysUser            SysUser `json:"sysUser" form:"sysUser" gorm:"comment:管理详情"`
-	sg.HasTenant
+	sg.MultiTenancy
 }

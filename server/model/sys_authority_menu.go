@@ -8,7 +8,7 @@ type SysMenu struct {
 	AuthorityId string                 `json:"-" gorm:"comment:角色ID"`
 	Children    []SysMenu              `json:"children" gorm:"-"`
 	Parameters  []SysBaseMenuParameter `json:"parameters" gorm:"foreignKey:SysBaseMenuID;references:MenuId"`
-	sg.HasTenant
+	sg.MultiTenancy
 }
 
 func (s SysMenu) TableName() string {

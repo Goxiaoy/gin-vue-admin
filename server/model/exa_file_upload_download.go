@@ -11,5 +11,5 @@ type ExaFileUploadAndDownload struct {
 	Url  string `json:"url" gorm:"comment:文件地址"`
 	Tag  string `json:"tag" gorm:"comment:文件标签"`
 	Key  string `json:"key" gorm:"comment:编号"`
-	sg.HasTenant
+	sg.MultiTenancy
 }

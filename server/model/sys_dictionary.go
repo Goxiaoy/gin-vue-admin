@@ -14,5 +14,5 @@ type SysDictionary struct {
 	Status               *bool                 `json:"status" form:"status" gorm:"column:status;comment:状态"`
 	Desc                 string                `json:"desc" form:"desc" gorm:"column:desc;comment:描述"`
 	SysDictionaryDetails []SysDictionaryDetail `json:"sysDictionaryDetails" form:"sysDictionaryDetails"`
-	sg.HasTenant
+	sg.MultiTenancy
 }

@@ -12,5 +12,5 @@ type ExaSimpleUploader struct {
 	TotalChunks      string `json:"totalChunks" gorm:"comment:切片总数"`
 	IsDone           bool   `json:"isDone" gorm:"comment:是否上传完成"`
 	FilePath         string `json:"filePath" gorm:"comment:文件本地路径"`
-	sg.HasTenant
+	sg.MultiTenancy
 }

@@ -15,5 +15,5 @@ type SysAuthority struct {
 	DataAuthorityId []SysAuthority `json:"dataAuthorityId" gorm:"many2many:sys_data_authority_id"`
 	Children        []SysAuthority `json:"children" gorm:"-"`
 	SysBaseMenus    []SysBaseMenu  `json:"menus" gorm:"many2many:sys_authority_menus;"`
-	sg.HasTenant
+	sg.MultiTenancy
 }

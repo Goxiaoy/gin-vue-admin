@@ -21,5 +21,5 @@ type SysOperationRecord struct {
 	Resp         string        `json:"resp" form:"resp" gorm:"type:longtext;column:resp;comment:响应Body"`
 	UserID       int           `json:"user_id" form:"user_id" gorm:"column:user_id;comment:用户id"`
 	User         SysUser       `json:"user"`
-	sg.HasTenant
+	sg.MultiTenancy
 }

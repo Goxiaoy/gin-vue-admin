@@ -14,7 +14,7 @@ type ExaFile struct {
 	ExaFileChunk []ExaFileChunk
 	ChunkTotal   int
 	IsFinish     bool
-	sg.HasTenant
+	sg.MultiTenancy
 }
 
 // file chunk struct, 切片结构体
@@ -23,5 +23,5 @@ type ExaFileChunk struct {
 	ExaFileID       uint
 	FileChunkNumber int
 	FileChunkPath   string
-	sg.HasTenant
+	sg.MultiTenancy
 }
