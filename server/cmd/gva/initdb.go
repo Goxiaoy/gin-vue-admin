@@ -83,13 +83,18 @@ var initdbCmd = &cobra.Command{
 		if err!=nil{
 			panic(err)
 		}
-		for _, tenant := range tenantDbAll {
+		all := []*domain.Tenant{
+			//host side
+			{ID: "",Name: ""},
+		}
+		all = append(all,tenantDbAll...)
+		for _, tenant := range all {
+			color.Info.Printf("[Migration]--> 正在迁移租户: %v %v\n", tenant.ID,tenant.Name)
 			newCtx := common.NewCurrentTenant(context.Background(),tenant.ID,tenant.Name)
 			db := gorm.GetDb(newCtx,global.GVA_DB_PROVIDER)
 			switch global.GVA_CONFIG.System.DbType {
 			case "mysql":
 				datas.InitMysqlTables(newCtx,db)
-				//TODO read config from params
 				datas.InitMysqlData(newCtx,db)
 			case "postgresql":
 				color.Info.Println("postgresql功能开发中")
