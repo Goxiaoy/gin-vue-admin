@@ -1,7 +1,6 @@
 package model
 
 import (
-	sg "github.com/goxiaoy/go-saas/gorm"
 	"time"
 )
 
@@ -15,5 +14,4 @@ type SysAuthority struct {
 	DataAuthorityId []SysAuthority `json:"dataAuthorityId" gorm:"many2many:sys_data_authority_id"`
 	Children        []SysAuthority `json:"children" gorm:"-"`
 	SysBaseMenus    []SysBaseMenu  `json:"menus" gorm:"many2many:sys_authority_menus;"`
-	TenantId sg.HasTenant `gorm:"index;primary_key"`
 }
