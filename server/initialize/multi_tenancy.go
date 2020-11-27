@@ -16,13 +16,19 @@ func InitMultiTenancyDb()  {
 	initTenantStore()
 }
 
-func MigrateTenantManagementAndHostTable()  {
+func GetAndMigrateHostDb() *gorm.DB  {
 	hostDb := sgm.GetDb(context.Background(),global.GVA_DB_PROVIDER)
 	err :=sgm.AutoMigrate(nil,hostDb)
 	if err!=nil{
 		panic(err)
 	}
+	return hostDb
+}
+
+func MigrateTenantManagementAndHostTable() *gorm.DB {
+	hostDb := GetAndMigrateHostDb()
 	MysqlTables(hostDb) // 初始化表
+	return hostDb
 }
 
 func initDbProvider()(*sg.DefaultDbProvider, sg.DbClean) {
@@ -61,6 +67,6 @@ func initDbProvider()(*sg.DefaultDbProvider, sg.DbClean) {
 }
 
 func initTenantStore()  {
-	tenantRepo := &sgm.GormTenantRepo{DbProvider: global.GVA_DB_PROVIDER}
-	global.GVA_TENANT_STORE=sgm.NewGormTenantStore(tenantRepo)
+	global.GVA_TENATN_REPO = &sgm.GormTenantRepo{DbProvider: global.GVA_DB_PROVIDER}
+	global.GVA_TENANT_STORE=sgm.NewGormTenantStore(global.GVA_TENATN_REPO)
 }

@@ -14,12 +14,12 @@ import (
 
 func InitExaFileUploadAndDownload(tenant sg.MultiTenancy,db *gorm.DB) {
 	var files = []model.ExaFileUploadAndDownload{
-		{global.GVA_MODEL{ID: 1, CreatedAt: time.Now(), UpdatedAt: time.Now()}, "10.png", "http://qmplusimg.henrongyi.top/gvalogo.png", "png", "158787308910.png",tenant},
-		{global.GVA_MODEL{ID: 2, CreatedAt: time.Now(), UpdatedAt: time.Now()}, "logo.png", "http://qmplusimg.henrongyi.top/1576554439myAvatar.png", "png", "1587973709logo.png",tenant},
+		{global.GVA_MODEL{ CreatedAt: time.Now(), UpdatedAt: time.Now()}, "10.png", "http://qmplusimg.henrongyi.top/gvalogo.png", "png", "158787308910.png",tenant},
+		{global.GVA_MODEL{ CreatedAt: time.Now(), UpdatedAt: time.Now()}, "logo.png", "http://qmplusimg.henrongyi.top/1576554439myAvatar.png", "png", "1587973709logo.png",tenant},
 	}
 
 	if err := db.Transaction(func(tx *gorm.DB) error {
-		if tx.Where("id IN ?", []int{1, 2}).Find(&[]model.ExaFileUploadAndDownload{}).RowsAffected == 2 {
+		if tx.Where("name IN ?", []string{"10.png", "logo.png"}).Find(&[]model.ExaFileUploadAndDownload{}).RowsAffected == 2 {
 			color.Danger.Println("exa_file_upload_and_downloads表的初始数据已存在!")
 			return nil
 		}

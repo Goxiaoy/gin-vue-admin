@@ -30,7 +30,7 @@ func InitMysqlData(ctx context.Context,db *gorm.DB) {
 	InitExaFileUploadAndDownload(tenant,db)
 }
 
-func InitMysqlTables(db *gorm.DB) {
+func InitMysqlTables(ctx context.Context,db *gorm.DB) {
 	var err error
 	if !db.Migrator().HasTable("casbin_rule") {
 		err = db.Migrator().CreateTable(&gormadapter.CasbinRule{})

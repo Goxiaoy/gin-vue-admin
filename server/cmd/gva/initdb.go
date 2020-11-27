@@ -20,6 +20,9 @@ import (
 	"gin-vue-admin/cmd/datas"
 	"gin-vue-admin/core"
 	"gin-vue-admin/initialize"
+	"github.com/goxiaoy/go-saas/common"
+	"github.com/goxiaoy/go-saas/management/domain"
+	"github.com/goxiaoy/go-saas/management/gorm"
 
 	"github.com/gookit/color"
 
@@ -42,22 +45,64 @@ var initdbCmd = &cobra.Command{
 		path, _ := cmd.Flags().GetString("path")
 		global.GVA_VP = core.Viper(path)
 		global.GVA_LOG = core.Zap()           // 初始化zap日志库
-		db := initialize.GormMysql()
-		switch global.GVA_CONFIG.System.DbType {
-		case "mysql":
-			datas.InitMysqlTables(db)
-			//TODO read config from params
-			datas.InitMysqlData(context.Background(),db)
-		case "postgresql":
-			color.Info.Println("postgresql功能开发中")
-		case "sqlite":
-			color.Info.Println("sqlite功能开发中")
-		case "sqlserver":
-			color.Info.Println("sqlserver功能开发中")
-		default:
-			datas.InitMysqlTables(db)
-			datas.InitMysqlData(context.Background(),db)
+
+		initialize.InitMultiTenancyDb()
+		initialize.GetAndMigrateHostDb()
+		ctx := context.Background()
+		tr := global.GVA_TENATN_REPO
+		its := []domain.Tenant{
+			{
+				ID:          "6045b1e6-b25d-4f97-b3f5-a6289513aae2",
+				Name:        "t1",
+				DisplayName: "Test1",
+			},
+			{
+				ID:          "34bd2809-c7e2-43f8-b406-9073a23f256d",
+				Name:        "t2",
+				DisplayName: "Test2",
+			},
 		}
+		for _, it := range its {
+			t,err:= tr.FindByIdOrName(ctx,it.ID)
+			if err!=nil{
+				panic(err)
+			}
+			if t==nil{
+				//create
+				err :=tr.Create(ctx,it)
+				if err!=nil{
+					panic(err)
+				}
+			}
+		}
+
+		_,tenantDbAll,err := tr.GetPaged(ctx,common.Pagination{
+			Offset: 0,
+			Limit:  int(^uint(0) >> 1),
+		})
+		if err!=nil{
+			panic(err)
+		}
+		for _, tenant := range tenantDbAll {
+			newCtx := common.NewCurrentTenant(context.Background(),tenant.ID,tenant.Name)
+			db := gorm.GetDb(newCtx,global.GVA_DB_PROVIDER)
+			switch global.GVA_CONFIG.System.DbType {
+			case "mysql":
+				datas.InitMysqlTables(newCtx,db)
+				//TODO read config from params
+				datas.InitMysqlData(newCtx,db)
+			case "postgresql":
+				color.Info.Println("postgresql功能开发中")
+			case "sqlite":
+				color.Info.Println("sqlite功能开发中")
+			case "sqlserver":
+				color.Info.Println("sqlserver功能开发中")
+			default:
+				datas.InitMysqlTables(newCtx,db)
+				datas.InitMysqlData(newCtx,db)
+			}
+		}
+
 		frame, _ := cmd.Flags().GetString("frame")
 		if frame == "gf" {
 			color.Info.Println("gf功能开发中")

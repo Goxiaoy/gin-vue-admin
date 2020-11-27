@@ -5,6 +5,7 @@ import (
 	"github.com/goxiaoy/go-saas/common"
 	"github.com/goxiaoy/go-saas/data"
 	sg "github.com/goxiaoy/go-saas/gorm"
+	"github.com/goxiaoy/go-saas/management/domain"
 	"go.uber.org/zap"
 
 	"gin-vue-admin/config"
@@ -25,6 +26,7 @@ var (
 	//interface for provider
 	GVA_DB_PROVIDER sg.DbProvider
 	GVA_DB_CLEAN sg.DbClean
+	GVA_TENATN_REPO domain.TenantRepo
 
 )
 
