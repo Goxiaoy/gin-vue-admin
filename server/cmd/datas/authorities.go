@@ -12,11 +12,11 @@ import (
 
 
 
-func InitSysAuthority(tenant sg.HasTenant, db *gorm.DB) {
+func InitSysAuthority(tenant sg.MultiTenancy, db *gorm.DB) {
 	var authorities = []model.SysAuthority{
-		{CreatedAt: time.Now(), UpdatedAt: time.Now(), AuthorityId: "888", AuthorityName: "普通用户", ParentId: "0",HasTenant:tenant},
-		{CreatedAt: time.Now(), UpdatedAt: time.Now(), AuthorityId: "8881", AuthorityName: "普通用户子角色", ParentId: "888",HasTenant:tenant},
-		{CreatedAt: time.Now(), UpdatedAt: time.Now(), AuthorityId: "9528", AuthorityName: "测试角色", ParentId: "0",HasTenant:tenant},
+		{CreatedAt: time.Now(), UpdatedAt: time.Now(), AuthorityId: "888", AuthorityName: "普通用户", ParentId: "0"},
+		{CreatedAt: time.Now(), UpdatedAt: time.Now(), AuthorityId: "8881", AuthorityName: "普通用户子角色", ParentId: "888"},
+		{CreatedAt: time.Now(), UpdatedAt: time.Now(), AuthorityId: "9528", AuthorityName: "测试角色", ParentId: "0"},
 	}
 	if err := db.Transaction(func(tx *gorm.DB) error {
 		if tx.Where("authority_id IN ? ", []string{"888", "9528"}).Find(&[]model.SysAuthority{}).RowsAffected == 2 {

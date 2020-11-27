@@ -13,9 +13,9 @@ import (
 
 
 
-func InitExaCustomer(tenant sg.HasTenant, db *gorm.DB) {
+func InitExaCustomer(tenant sg.MultiTenancy, db *gorm.DB) {
 	var customers = []model.ExaCustomer{
-		{GVA_MODEL: global.GVA_MODEL{ID: 1, CreatedAt: time.Now(), UpdatedAt: time.Now()}, CustomerName: "测试客户", CustomerPhoneData: "1761111111", SysUserID: 1, SysUserAuthorityID: "888",HasTenant:tenant},
+		{GVA_MODEL: global.GVA_MODEL{ID: 1, CreatedAt: time.Now(), UpdatedAt: time.Now()}, CustomerName: "测试客户", CustomerPhoneData: "1761111111", SysUserID: 1, SysUserAuthorityID: "888"},
 	}
 	if err := db.Transaction(func(tx *gorm.DB) error {
 		if tx.Where("id IN ? ", []int{1}).Find(&[]model.ExaCustomer{}).RowsAffected == 1 {

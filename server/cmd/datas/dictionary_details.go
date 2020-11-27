@@ -11,7 +11,7 @@ import (
 	sg "github.com/goxiaoy/go-saas/gorm"
 )
 
-func InitSysDictionaryDetail(tenant sg.HasTenant,db *gorm.DB) {
+func InitSysDictionaryDetail(tenant sg.MultiTenancy,db *gorm.DB) {
 	status := new(bool)
 	*status = true
 	DictionaryDetail := []model.SysDictionaryDetail{

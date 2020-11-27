@@ -13,16 +13,8 @@ import (
 
 func InitMysqlData(ctx context.Context,db *gorm.DB) {
 	tenantId := common.FromCurrentTenant(ctx).Id
-	var tenant sg.HasTenant
-	if tenantId==""{
-		tenant = sg.HasTenant{
-			Valid: false,
-		}
-	}else{
-		tenant = sg.HasTenant{
-			String: tenantId,
-			Valid: true,
-		}
+	tenant:=sg.MultiTenancy{
+		TenantId: sg.NewTenantId(tenantId),
 	}
 	InitSysApi(db)
 	InitSysUser(tenant,db)
