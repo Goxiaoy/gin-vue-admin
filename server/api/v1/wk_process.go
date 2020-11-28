@@ -21,7 +21,7 @@ import (
 func CreateWorkflowProcess(c *gin.Context) {
 	var workflowProcess model.WorkflowProcess
 	_ = c.ShouldBindJSON(&workflowProcess)
-	err := service.CreateWorkflowProcess(workflowProcess)
+	err := service.CreateWorkflowProcess(c.Request.Context(),workflowProcess,)
 	if err != nil {
 		response.FailWithMessage(fmt.Sprintf("创建失败，%v", err), c)
 	} else {
@@ -40,7 +40,7 @@ func CreateWorkflowProcess(c *gin.Context) {
 func DeleteWorkflowProcess(c *gin.Context) {
 	var workflowProcess model.WorkflowProcess
 	_ = c.ShouldBindJSON(&workflowProcess)
-	err := service.DeleteWorkflowProcess(workflowProcess)
+	err := service.DeleteWorkflowProcess(c.Request.Context(),workflowProcess)
 	if err != nil {
 		response.FailWithMessage(fmt.Sprintf("删除失败，%v", err), c)
 	} else {
@@ -59,7 +59,7 @@ func DeleteWorkflowProcess(c *gin.Context) {
 func DeleteWorkflowProcessByIds(c *gin.Context) {
 	var IDS request.IdsReq
 	_ = c.ShouldBindJSON(&IDS)
-	err := service.DeleteWorkflowProcessByIds(IDS)
+	err := service.DeleteWorkflowProcessByIds(c.Request.Context(),IDS)
 	if err != nil {
 		response.FailWithMessage(fmt.Sprintf("删除失败，%v", err), c)
 	} else {
@@ -78,7 +78,7 @@ func DeleteWorkflowProcessByIds(c *gin.Context) {
 func UpdateWorkflowProcess(c *gin.Context) {
 	var workflowProcess model.WorkflowProcess
 	_ = c.ShouldBindJSON(&workflowProcess)
-	err := service.UpdateWorkflowProcess(&workflowProcess)
+	err := service.UpdateWorkflowProcess(c.Request.Context(),&workflowProcess)
 	if err != nil {
 		response.FailWithMessage(fmt.Sprintf("更新失败，%v", err), c)
 	} else {
@@ -97,7 +97,7 @@ func UpdateWorkflowProcess(c *gin.Context) {
 func FindWorkflowProcess(c *gin.Context) {
 	var workflowProcess model.WorkflowProcess
 	_ = c.ShouldBindQuery(&workflowProcess)
-	err, reworkflowProcess := service.GetWorkflowProcess(workflowProcess.ID)
+	err, reworkflowProcess := service.GetWorkflowProcess(c.Request.Context(),workflowProcess.ID)
 	if err != nil {
 		response.FailWithMessage(fmt.Sprintf("查询失败，%v", err), c)
 	} else {
@@ -116,7 +116,7 @@ func FindWorkflowProcess(c *gin.Context) {
 func FindWorkflowStep(c *gin.Context) {
 	var workflowProcess model.WorkflowProcess
 	_ = c.ShouldBindQuery(&workflowProcess)
-	err, workflow := service.FindWorkflowStep(workflowProcess.ID)
+	err, workflow := service.FindWorkflowStep(c.Request.Context(),workflowProcess.ID)
 	if err != nil {
 		response.FailWithMessage(fmt.Sprintf("查询失败，%v", err), c)
 	} else {
@@ -135,7 +135,7 @@ func FindWorkflowStep(c *gin.Context) {
 func GetWorkflowProcessList(c *gin.Context) {
 	var pageInfo request.WorkflowProcessSearch
 	_ = c.ShouldBindQuery(&pageInfo)
-	err, list, total := service.GetWorkflowProcessInfoList(pageInfo)
+	err, list, total := service.GetWorkflowProcessInfoList(c.Request.Context(),pageInfo)
 	if err != nil {
 		response.FailWithMessage(fmt.Sprintf("获取数据失败，%v", err), c)
 	} else {
@@ -159,7 +159,7 @@ func StartWorkflow(c *gin.Context) {
 	business := c.Query("businessType")
 	wfInfo := model.WorkflowBusinessStruct[business]()
 	c.ShouldBindJSON(wfInfo)
-	err := service.StartWorkflow(wfInfo)
+	err := service.StartWorkflow(c.Request.Context(),wfInfo)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
@@ -178,7 +178,7 @@ func CompleteWorkflowMove(c *gin.Context) {
 	business := c.Query("businessType")
 	wfInfo := model.WorkflowBusinessStruct[business]()
 	c.ShouldBindJSON(wfInfo)
-	err := service.CompleteWorkflowMove(wfInfo)
+	err := service.CompleteWorkflowMove(c.Request.Context(),wfInfo)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
@@ -200,7 +200,7 @@ func GetMyStated(c *gin.Context) {
 		response.FailWithMessage(errStr, c)
 	} else {
 		waitUse := claims.(*request.CustomClaims)
-		err, wfms := service.GetMyStated(waitUse.ID)
+		err, wfms := service.GetMyStated(c.Request.Context(),waitUse.ID)
 		if err != nil {
 			errStr := err.Error()
 			global.GVA_LOG.Error(errStr)
@@ -225,7 +225,7 @@ func GetMyNeed(c *gin.Context) {
 		response.FailWithMessage(errStr, c)
 	} else {
 		waitUse := claims.(*request.CustomClaims)
-		err, wfms := service.GetMyNeed(waitUse.ID, waitUse.AuthorityId)
+		err, wfms := service.GetMyNeed(c.Request.Context(),waitUse.ID, waitUse.AuthorityId)
 		if err != nil {
 			errStr := err.Error()
 			global.GVA_LOG.Error(errStr)
@@ -247,7 +247,7 @@ func GetMyNeed(c *gin.Context) {
 func GetWorkflowMoveByID(c *gin.Context) {
 	var req request.GetById
 	_ = c.ShouldBindQuery(&req)
-	err, move, moves, business := service.GetWorkflowMoveByID(req.Id)
+	err, move, moves, business := service.GetWorkflowMoveByID(c.Request.Context(),req.Id)
 	if err != nil {
 		errStr := err.Error()
 		global.GVA_LOG.Error(errStr)

@@ -46,7 +46,7 @@ func initDbProvider()(*sg.DefaultDbProvider, sg.DbClean) {
 			}
 			return mysql.New(mysqlConfig)
 		},
-		Cfg:          GormConfig(m.LogMode),
+		Cfg:          GetGormConfig(m.LogMode),
 		MaxOpenConns: m.MaxOpenConns,
 		MaxIdleConns: m.MaxOpenConns,
 	}

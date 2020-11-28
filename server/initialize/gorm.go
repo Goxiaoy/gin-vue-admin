@@ -44,7 +44,7 @@ func MysqlTables(db *gorm.DB) {
 
 
 // gormConfig 根据配置决定是否开启日志
-func GormConfig(mod bool) *gorm.Config {
+func GetGormConfig(mod bool) *gorm.Config {
 	if global.GVA_CONFIG.Mysql.LogZap {
 		return &gorm.Config{
 			Logger:                                   Default.LogMode(logger.Info),
