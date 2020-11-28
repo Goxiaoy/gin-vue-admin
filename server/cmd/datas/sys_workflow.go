@@ -5,7 +5,6 @@ import (
 	"gin-vue-admin/model"
 	"github.com/gookit/color"
 	"gorm.io/gorm"
-	"os"
 	"time"
 )
 
@@ -57,6 +56,6 @@ func InitWkProcess(db *gorm.DB) {
 		return nil
 	}); err != nil {
 		color.Warn.Printf("[Mysql]-->工作流相关 表的初始数据失败,err: %v\n", err)
-		os.Exit(0)
+		//os.Exit(0)
 	}
 }

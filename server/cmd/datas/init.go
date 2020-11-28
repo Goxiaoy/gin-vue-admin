@@ -24,7 +24,7 @@ func InitMysqlData(ctx context.Context,db *gorm.DB) {
 	InitSysBaseMenus(db)
 	InitAuthorityMenu(tenant,db)
 	InitSysDictionary(tenant,db)
-	InitSysAuthorityMenus(tenant,db)
+	InitSysAuthorityMenus(db)
 	InitSysDataAuthorityId(db)
 	InitSysDictionaryDetail(tenant,db)
 	InitExaFileUploadAndDownload(tenant,db)

@@ -1,8 +1,8 @@
 package model
 
 import (
+	"database/sql"
 	"gin-vue-admin/global"
-	sg "github.com/goxiaoy/go-saas/gorm"
 	"gorm.io/gorm"
 	"time"
 )
@@ -62,7 +62,6 @@ type WorkflowMove struct {
 	WorkflowProcess   WorkflowProcess `gorm:"<-:false" json:"workflowProcess" gorm:"comment:工作流模板具体信息"`
 	WorkflowNodeID    string          `json:"workflowNodeID" gorm:"comment:工作流节点ID"`
 	WorkflowNode      WorkflowNode    `gorm:"<-:false" json:"workflowNode" gorm:"comment:工作流节点具体信息"`
-	sg.MultiTenancy
 	BusinessType      string          `json:"businessType" gorm:"comment:业务标记"`
 	BusinessID        uint            `json:"businessID" gorm:"comment:业务ID"`
 	PromoterID        uint            `json:"promoterID" gorm:"comment:当前流转发起人"`
@@ -112,7 +111,7 @@ type WorkflowNode struct {
 	Cycle             string         `json:"cycle" gorm:"comment:循环时间"`
 	Duration          string         `json:"duration" gorm:"comment:持续时间"`
 	HideIcon          bool           `json:"hideIcon" gorm:"comment:是否隐藏图标"`
-	DueDate           time.Time      `json:"dueDate" gorm:"comment:到期时间"`
+	DueDate           sql.NullTime      `json:"dueDate" gorm:"comment:到期时间"`
 	AssignType        string         `json:"assignType" gorm:"comment:审批类型"`
 	AssignValue       string         `json:"assignValue" gorm:"comment:审批类型值"`
 	Success           bool           `json:"success" gorm:"comment:是否成功"`
@@ -149,7 +148,6 @@ type WorkflowStartPoint struct {
 }
 
 type WorkflowEndPoint struct {
-	sg.MultiTenancy
 	WorkflowEdgeID string
 	global.GVA_MODEL
 	X     float64 `json:"x"`
